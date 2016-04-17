@@ -1,0 +1,369 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=Generator content="Microsoft Word 15 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:"Lucida Console";
+	panose-1:2 11 6 9 4 5 4 2 2 4;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:8.0pt;
+	margin-left:0in;
+	line-height:107%;
+	font-size:11.0pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:#954F72;
+	text-decoration:underline;}
+p
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman",serif;}
+.MsoPapDefault
+	{margin-bottom:8.0pt;
+	line-height:107%;}
+@page WordSection1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.0in 1.0in 1.0in;}
+div.WordSection1
+	{page:WordSection1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US link=blue vlink="#954F72">
+
+<div class=WordSection1>
+
+<p><span style='font-size:22.0pt;font-family:"Calibri",sans-serif;color:black'>Practical
+Machine Learning Assignment</span></p>
+
+<p><span style='font-family:"Calibri",sans-serif;color:black'>One thing that
+people regularly do is quantify how much of a particular activity they do, but
+they rarely quantify how well they do it</span><span style='color:#333333;
+background:white'>. In the data consider here</span><span style='font-family:
+"Calibri",sans-serif;color:black'>, people were asked to perform barbell lifts
+correctly and incorrectly in five different ways. For more information, see the
+“Weight Lifting Exercises Dataset” in the following location: <a
+href="http://groupware.les.inf.puc-rio.br/har"><span style='color:purple'>http://groupware.les.inf.puc-rio.br/har</span></a></span></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%;color:#333333;
+background:white'> The goal of this project is to predict the manner in which
+they did the exercise. This is the &quot;classe&quot; variable in the training
+set. I use other predictor variables to predict “classe”</span></p>
+
+<p class=MsoNormal><span style='font-size:10.5pt;line-height:107%;font-family:
+"Arial",sans-serif;color:#333333;background:white'>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>In this
+analysis I use caret and randomForest packages.</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>library(caret)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>library(randomForest)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'># Loading required package: lattice</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'># Loading required package: ggplot2</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>First I load
+training and testing datasets </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>training  &lt;- 
+read.csv(&quot;pml-training.csv&quot;,  header = T,  na.string =
+c(&quot;NA&quot;,&quot;&quot;) )</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>testing  &lt;- 
+read.csv(&quot;pml-testing.csv&quot;,  header = T,  na.string =
+c(&quot;NA&quot;, &quot; &quot;))</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>dim(training)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>#[1] 19622   160</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>Remove the
+columns that all values are missing </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>train.noNA &lt;- training[ ,
+colSums(is.na(training)) == 0]</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>#dim(train.NA)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>#[1] 19622    60</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>#remove columns with NA values</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>names.noNA &lt;-
+names(training)[colSums(is.na(training)) == 0]</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>training.noNA &lt;- training[ , names.noNA]</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>dim(training.noNA)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;background:#D0CECE'>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>Remove other
+unnecessary columns for predictions</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>training.noNA &lt;- training.noNA[ , -c(1:7)]</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>dim(training.noNA)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>#[1] 19622    53</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%;color:black;
+background:white'>Now we split the training dataset into a training dataset and
+a test dataset for cross validation</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>index &lt;- createDataPartition(y = training.noNA$classe, p = 0.75,
+list = FALSE )</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>train &lt;- training.noNA[index, ]</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>test &lt;- training.noNA[-index, ]</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>We fit a random
+forest using all predictor variables</span></p>
+
+<p class=MsoNormal style='background:#D0CECE'>model.rf &lt;-
+randomForest(classe ~. , data = train)</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>#prediction for training data</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>pred.train &lt;- predict(model.rf, newdata = train, type =
+&quot;class&quot;)</p>
+
+<p class=MsoNormal style='background:#D0CECE'>confusionMatrix(pred.train,
+train$classe)</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>#prediction for testing data</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>pred.test &lt;- predict(model.rf, newdata = test, type =
+&quot;class&quot;)</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;background:
+#D0CECE'>confusionMatrix(pred.test, test$classe)</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:12.0pt'>Confusion Matrix
+and Statistics for the training data is given below. Out of Sample accuracy for
+the model is 99%. So we assume to get very accurate predictions from this
+random forest model. </span><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black'>I tried several other machine learning models but this model gives
+the highest accuracy. So this will be used to do the predictions.</span></p>
+
+<p class=MsoNormal><span style='font-size:12.0pt;line-height:107%'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Confusion Matrix and Statistics</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>          Reference</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Prediction    A    B    C    D    E</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>         A 1394    9    0    0    0</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>         B    0  940    4    0    0</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>         C    1    0  851    9    0</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>         D    0    0    0  794    3</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>         E    0    0    0    1  898</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Overall Statistics</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>                                         </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>               Accuracy : 0.9945         </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>                 95% CI : (0.992, 0.9964)</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>    No Information Rate : 0.2845         </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>    P-Value [Acc &gt; NIR] : &lt; 2.2e-16      </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>                                         </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>                  Kappa : 0.993          </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'> Mcnemar's Test P-Value : NA             </span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Statistics by Class:</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>                     Class: A Class: B Class: C
+Class: D Class: E</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Sensitivity            0.9993   0.9905  
+0.9953   0.9876   0.9967</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Specificity            0.9974   0.9990  
+0.9975   0.9993   0.9998</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Pos Pred Value         0.9936   0.9958  
+0.9884   0.9962   0.9989</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Neg Pred Value         0.9997   0.9977  
+0.9990   0.9976   0.9993</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Prevalence             0.2845   0.1935  
+0.1743   0.1639   0.1837</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Detection Rate         0.2843   0.1917  
+0.1735   0.1619   0.1831</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Detection Prevalence   0.2861   0.1925  
+0.1756   0.1625   0.1833</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>Balanced Accuracy      0.9984   0.9948  
+0.9964   0.9934   0.9982</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-bottom:0in;margin-bottom:.0001pt;line-height:
+normal;word-break:break-all'><span style='font-size:10.0pt;font-family:"Lucida Console";
+color:black;background:#E1E2E5'>&nbsp;</span></p>
+
+</div>
+
+</body>
+
+</html>
