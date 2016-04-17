@@ -1,0 +1,67 @@
+---
+title: "Practical Machine Learning Assignment"
+output: html_document
+---
+
+One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this dataset, people were asked to perform barbell lifts correctly and incorrectly in five different ways. For more information, see the "Weight Lifting Exercises Dataset" in the following location: <http://groupware.les.inf.puc-rio.br/har>
+ The goal of this project is to predict the manner in which they did the exercise. This is the "classe" variable in the training set. I use other predictor variables to predict "classe"
+
+In this analysis I use caret and randomForest packages.
+
+
+
+```{r}
+library(caret)
+library(randomForest)
+
+```
+
+First I load training and testing datasets 
+```{r}
+training <- read.csv("pml-training.csv", header = T, na.string = c("NA","") )
+testing <- read.csv("pml-testing.csv", header = T, na.string = c("NA", " "))
+```
+
+Remove the columns that all values are missing 
+```{r}
+train.noNA <- training[ , colSums(is.na(training)) == 0]
+dim(train.noNA)
+
+#remove columns with NA values
+names.noNA <- names(training)[colSums(is.na(training)) == 0]
+training.noNA <- training[ , names.noNA]
+dim(training.noNA)
+```
+
+Remove other unnecessary columns for predictions
+
+```{r}
+training.noNA <- training.noNA[ , -c(1:7)]
+dim(training.noNA)
+
+```
+Now we split the training dataset into a training dataset and a test dataset for cross validation
+```{r}
+index <- createDataPartition(y = training.noNA$classe, p = 0.75, list = FALSE )
+train <- training.noNA[index, ]
+test <- training.noNA[-index, ]
+
+```
+We fit a random forest using all predictor variables
+```{r}
+model.rf <- randomForest(classe ~. , data = train)
+```
+
+prediction for training data
+```{r}
+pred.train <- predict(model.rf, newdata = train, type = "class")
+#confusionMatrix(pred.train, train$classe)
+```
+prediction for testing data
+```{r}
+pred.test <- predict(model.rf, newdata = test, type = "class")
+confusionMatrix(pred.test, test$classe)
+```
+Confusion Matrix and Statistics for the training data is given below. Out of Sample accuracy for the model is 99%. So we assume to get very accurate predictions from this random forest model. I tried several other machine learning models but this model gives the highest accuracy. So this will be used to do the predictions.
+
+
